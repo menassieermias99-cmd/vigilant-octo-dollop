@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormField, FieldType } from "@/types/form";
 import { saveFormSchemaAction } from "@/app/actions";
 import SortableField from "./SortableField";
@@ -61,6 +61,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
   const [fields, setFields] = useState<FormField[]>(initialForm.fields);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   //dnd-kit sensors setup
   const sensors = useSensors(
@@ -119,6 +120,21 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
   };
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) || null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // return a skeleton layout while rehydrating on the client
+    return (
+      <div className="h-screen w-screen flex bg-slate-950 text-slate-100 items-center justify-center">
+        <p className="text-sm text-slate-500 font-mono">
+          Loading Builder Canvas ...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden ">
