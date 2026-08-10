@@ -3,6 +3,42 @@
 import { db } from "@/lib/db";
 import { FormField } from "@/types/form";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+//Authentication
+
+const ADMIN_PASSCODE = process.env.ADMINPASSCODE || "thisistheend-1";
+
+export async function loginAction(passcode: string) {
+  if (passcode === ADMIN_PASSCODE) {
+    const cookieStore = await cookies();
+    cookieStore.set("admin_session", "authenticated", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+    return { success: true };
+  }
+
+  return { success: false, error: "Invalid Passcode, try 'thisistheend-1'." };
+}
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("admin_session");
+  redirect("/login");
+}
+
+export async function verifyAuth() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+
+  return session?.value === "authenticated";
+}
+
+// ---- Form and Response Actions ---
 
 export async function createFormAction(title: string = "Untitled Form") {
   const form = await db.form.create({
