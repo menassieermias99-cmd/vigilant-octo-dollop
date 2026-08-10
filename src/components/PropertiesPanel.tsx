@@ -60,15 +60,28 @@ export default function PropertiesPanel({
         <label className="text-xs font-semibold text-slate-400">
           Field Label
         </label>
-
         <input
           type="text"
+          value={field.label}
+          onChange={(e) => onUpdateField({ ...field, label: e.target.value })}
           className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500"
-          value={field.placeholder || ""}
-          onChange={(e) =>
-            onUpdateField({ ...field, placeholder: e.target.value })
-          }
         />
+
+        {field.type !== "checkbox" && field.type !== "rating" && (
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-400">
+              Placeholder Text
+            </label>
+            <input
+              type="text"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500"
+              value={field.placeholder || ""}
+              onChange={(e) =>
+                onUpdateField({ ...field, placeholder: e.target.value })
+              }
+            />
+          </div>
+        )}
       </div>
 
       {/* Options editor for select dropdowns */}
