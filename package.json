@@ -2,6 +2,7 @@
   "name": "vigilant-octo-dollop",
   "version": "0.1.0",
   "private": true,
+  "author": "Menassie Ermias <menassieermias99@gmail.com>",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
