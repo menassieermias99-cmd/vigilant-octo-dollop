@@ -30,7 +30,7 @@ export default function Navbar({ formId, formTitle }: NavbarProps) {
           className="flex items-center gap-2 text-sm font-extrabold text-slate-100 hover:text-blue-400 transition"
         >
           <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-            FF
+            VOP
           </div>
           <span>Vigilant Octo Dollop</span>
         </Link>
