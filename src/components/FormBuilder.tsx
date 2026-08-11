@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FormField, FieldType } from "@/types/form";
 import { saveFormSchemaAction } from "@/app/actions";
 import SortableField from "./SortableField";
@@ -63,6 +64,8 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const router = useRouter();
+
   //dnd-kit sensors setup
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -109,14 +112,21 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
 
   const handleSave = async () => {
     setIsSaving(true);
-    await saveFormSchemaAction(
-      initialForm.id,
-      title,
-      description,
-      fields,
-      published,
-    );
-    setIsSaving(false);
+    try {
+      await saveFormSchemaAction(
+        initialForm.id,
+        title,
+        description,
+        fields,
+        published,
+      );
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to save form:", err);
+      alert("Failed to save form. Make sure you are logged in.");
+      setIsSaving(false);
+    }
   };
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) || null;
