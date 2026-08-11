@@ -30,7 +30,7 @@ export default async function HomePage() {
         <header className="flex items-center justify-between border-b border-slate-800 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">
-              FormFlow Studio
+              Viglant octo dollop Studio
             </h1>
             <p className="text-sm text-slate-400 mt-1">
               Visual drag-and-drop form builder with live response collection.

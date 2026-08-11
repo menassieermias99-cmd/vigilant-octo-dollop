@@ -32,7 +32,7 @@ export default function Navbar({ formId, formTitle }: NavbarProps) {
           <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
             FF
           </div>
-          <span>FormFlow</span>
+          <span>Vigilant Octo Dollop</span>
         </Link>
         {formTitle && (
           <span className="text-xs text-slate-500 font-medium border-l border-slate-800 pl-4 py-1 truncate max-w-[200px]">
