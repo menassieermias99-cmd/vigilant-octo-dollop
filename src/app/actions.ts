@@ -41,6 +41,9 @@ export async function verifyAuth() {
 // ---- Form and Response Actions ---
 
 export async function createFormAction(title: string = "Untitled Form") {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) throw new Error("Unauthorized");
+
   const form = await db.form.create({
     data: {
       title,
@@ -79,6 +82,9 @@ export async function saveFormSchemaAction(
   fields: FormField[],
   published: boolean,
 ) {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) throw new Error("Unauthorized");
+
   await db.form.update({
     where: { id },
     data: {
@@ -108,6 +114,9 @@ export async function submitFormResponseAction(
 }
 
 export async function getFormResponseAction(formId: string) {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) throw new Error("Unauthorized");
+
   const responses = await db.formResponse.findMany({
     where: { formId },
     orderBy: { createdAt: "desc" },
@@ -119,7 +128,18 @@ export async function getFormResponseAction(formId: string) {
   }));
 }
 
+export async function deleteResponseAction(responseId: string, formId: string) {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) throw new Error("Unauthorized");
+
+  await db.formResponse.delete({ where: { id: responseId } });
+  revalidatePath(`/responses/${formId}`);
+}
+
 export async function deleteFormAction(id: string) {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) throw new Error("Unauthorized");
+
   await db.form.delete({ where: { id } });
   revalidatePath("/");
 }
