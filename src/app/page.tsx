@@ -1,9 +1,21 @@
-import { createFormAction } from "./actions";
+import { createFormAction, verifyAuth, deleteFormAction } from "./actions";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { Plus, LayoutGrid, ArrowRight } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import {
+  Plus,
+  LayoutGrid,
+  Hammer,
+  ArrowRight,
+  BarChart3,
+  ExternalLink,
+  Trash2,
+} from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const isAuthenticated = await verifyAuth();
+  if (!isAuthenticated) redirect("/login");
+
   async function handleCreate() {
     "use server";
     const form = await createFormAction("Untitled Form");
@@ -11,9 +23,11 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-8 md:p-16">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <header className="flex items-center justify-between">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex-flex col">
+      <Navbar />
+
+      <main className="flex-1 p-8 md:p-12 max-w-6xl mx-auto w-full space-y-8">
+        <header className="flex items-center justify-between border-b border-slate-800 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               FormFlow Studio
@@ -25,19 +39,19 @@ export default function HomePage() {
           <form action={handleCreate}>
             <button
               type="submit"
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-600/20 flex items-centerg gap-2 text-sm"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-600/20 flex items-centerg gap-2 text-xs"
             >
               <Plus className="w-4 h-4" /> Create New Form
             </button>
           </form>
         </header>
-        <FormList />
-      </div>
-    </main>
+        <FormGrid />
+      </main>
+    </div>
   );
 }
 
-async function FormList() {
+async function FormGrid() {
   const forms = await db.form.findMany({
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { responses: true } } },
@@ -55,21 +69,47 @@ async function FormList() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {forms.map((form) => (
-        <a
-          key={form.id}
-          href={`/builder/${form.id}`}
-          className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition flex items-center justify-between group shadow-xl"
-        >
-          <div>
-            <h3 className="font-bold text-slate-200">{form.title}</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              {form._count.responses} reponses collected.
-            </p>
+        <div key={form.id} className="bg-slate-900">
+          <div className="flex">
+            <div className="space-y-1">
+              <h3 className="font-bold">{form.title}</h3>
+              <p className="text-xs">{form.description || "No Description."}</p>
+            </div>
+
+            <span
+              className={`px-2.5 ${form.published ? "bg-emerald-500/10" : "bg-amber-500/10"}`}
+            >
+              {form.published ? "Published" : "Draft"}
+            </span>
           </div>
-          <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition" />
-        </a>
+
+          <div className="flex">
+            <span className="text-xs">
+              <BarChart3 className="w-3.5" />
+              {form._count.responses} submissions
+            </span>
+
+            <div className="flex">
+              <a href={`/builder/${form.id}`} className="px-3">
+                <Hammer className="w-3.5" /> Edit
+              </a>
+
+              <a href={`/responses/${form.id}`} className="px-3">
+                <BarChart3 className="w-3.5" /> Responses
+              </a>
+
+              <a
+                href={`/submit/${form.id}`}
+                className="px-3"
+                title="Open Live Link"
+              >
+                <ExternalLink className="w-3.5" />
+              </a>
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );
