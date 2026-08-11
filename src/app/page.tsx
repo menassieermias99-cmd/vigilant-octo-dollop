@@ -108,7 +108,7 @@ async function FormGrid() {
 
               <a
                 href={`/responses/${form.id}`}
-                className="px-3 py-1/5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center gap-1.5"
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center gap-1.5"
               >
                 <BarChart3 className="w-3.5 h-3.5" /> Responses
               </a>
