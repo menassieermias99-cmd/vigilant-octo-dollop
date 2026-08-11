@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { FormField } from "@/types/form";
 import { submitFormResponseAction } from "@/app/actions";
-import { CheckCircle2, Star } from "lucide-react";
+import { CheckCircle2, LayoutGrid, Star, ArrowLeft } from "lucide-react";
 import { Span } from "next/dist/trace";
+import Link from "next/link";
 
 interface PublicFormProps {
   form: {
@@ -14,9 +15,11 @@ interface PublicFormProps {
     published: boolean;
     fields: FormField[];
   };
+
+  isAuthenticated?: boolean;
 }
 
-export default function PublicForm({ form }: PublicFormProps) {
+export default function PublicForm({ form, isAuthenticated }: PublicFormProps) {
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -34,14 +37,22 @@ export default function PublicForm({ form }: PublicFormProps) {
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await submitFormResponseAction(form.id, answers);
-    setIsSubmitting(false);
-    setSubmitted(true);
+
+    try {
+      await submitFormResponseAction(form.id, answers);
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit form please try again");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // success state
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
@@ -52,6 +63,28 @@ export default function PublicForm({ form }: PublicFormProps) {
             Thank you for completing {form.title}. Your answers have been
             recorded.
           </p>
+        </div>
+
+        <div className="pt-4 border-t border-slate-800 flex flex-col gap-3">
+          {/* Show return to studio link if user is logged in  */}
+          {isAuthenticated && (
+            <Link
+              href="/"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 px-4"
+            >
+              <LayoutGrid className="w-4 h-4" /> Return to Studio Dashboard
+            </Link>
+          )}
+
+          <button
+            onClick={() => {
+              setAnswers({});
+              setSubmitted(false);
+            }}
+            className="w-full py-2.5 bg-slate-500 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 px-4"
+          >
+            <ArrowLeft className="w-4 h-4" /> Submit Another Response
+          </button>
         </div>
       </div>
     );
